@@ -3,15 +3,13 @@ from collections import Counter
 import librosa
 import numpy as np
 
+from TextArea import *
+
 class GrafikCizme():
     def GrafikCiz(self, file_path, predictions):
         try:
             # Ses dosyasını yükle
             y, sr = librosa.load(file_path)
-
-            # Daha önceki çizimleri temizle
-            self.ax1.clear()
-            self.ax2.clear()
 
             # Ses dalgasını çiz
             librosa.display.waveshow(y, sr=sr, ax=self.ax1)
@@ -42,7 +40,7 @@ class GrafikCizme():
             self.canvas3.draw()
         except Exception as e:
             # Hata mesajını göster
-            self.BilgilendirmeKutusu.setText(e)
+            print(e)
 
     def GrafikTemizleme(self):
         try:
@@ -73,4 +71,4 @@ class GrafikCizme():
             self.canvas3.draw()
         except Exception as e:
             # Hata mesajını göster
-            self.BilgilendirmeKutusu.setText(e)
+            print(e)

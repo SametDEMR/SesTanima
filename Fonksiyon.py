@@ -11,9 +11,6 @@ import spacy
 import os
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
 import nltk
-nltk.download('vader_lexicon')
-
-
 
 
 from SesModelEgitim import *
@@ -46,7 +43,7 @@ class Fonksiyon(QWidget):
                 QApplication.processEvents()  # Arayüzün güncellenmesi sağlanıyor
 
                 samplerate = 44100  # Ses örnekleme oranı
-                duration = 10  # Kaydetme süresi (saniye)
+                duration = 5  # Kaydetme süresi (saniye)
                 file_path = 'kayit.wav'  # Kaydedilecek dosyanın adı ve formatı
 
                 # Mikrofon üzerinden ses kaydı yapılıyor
@@ -56,6 +53,7 @@ class Fonksiyon(QWidget):
                 # Kaydedilen ses dosyası belirtilen formata dönüştürülüp kaydediliyor
                 write(file_path, samplerate, (recorded_audio * 32767).astype(np.int16))
 
+            QApplication.processEvents()
             # Dosya yolunu kontrol etme işlemi
             if file_path:
                 return file_path  # Dosya yolu döndürülüyor
@@ -105,7 +103,6 @@ class Fonksiyon(QWidget):
 
 
 
-
     # SESİ APİ KULLANARAK METNE ÇEVİRME
     def SestenMetinYapma(self, file_path):
         recognizer = Sr.Recognizer()  # Ses tanıma için recognizer nesnesi oluşturuluyor
@@ -132,7 +129,6 @@ class Fonksiyon(QWidget):
 
         # Diğer hataları yakalama ve ekrana yazdırma
         except Exception as e:
-            print("2")
             print(e)  # Hata mesajı konsola yazdırılıyor
 
 
@@ -169,58 +165,57 @@ class Fonksiyon(QWidget):
         except Exception as e:
             # Hata durumunda hatayı konsola yazdır
             print(e)
-            print("3")
 
 
 
     # Sesin kime ait olduğunu bulma fonksiyonu
     def SesinKimeAitOlduğunuBulma(self, file_path):
         try:
-            # Daha önce eğitilmiş SVM modeli yükleniyor
-            model = joblib.load("SVM_linear_model.pkl")
+            model_file_name = "KNN_model.pkl"
+            knn_model = joblib.load(model_file_name)
 
-            # Ses dosyasını yükle
-            y, sr = librosa.load(file_path, sr=None)
+            y, sr = librosa.load(file_path, duration=15)
+            mfccs = np.mean(librosa.feature.mfcc(y=y, sr=sr, n_mfcc=13).T, axis=0)
 
-            # 1 saniyelik segment uzunluğunu belirle (örnekleme frekansı kadar)
-            segment_length = sr
+            intervals = librosa.effects.split(y, top_db=30)  # Sessizlik eşik değeri (30 dB)
 
             # Sonuçları saklamak için bir liste oluşturuluyor
             predictions = []
 
-            # Sesi 1 saniyelik segmentlere böl ve her bir segmenti işle
-            for i in range(0, len(y) // segment_length):
-                start_sample = i * segment_length  # Segmentin başlangıç noktası
-                end_sample = start_sample + segment_length  # Segmentin bitiş noktası
-
-                # Eğer segmentin bitişi toplam uzunluğu aşarsa, segmenti sınırla
-                if end_sample > len(y):
-                    end_sample = len(y)
+            # Her bir konuşma segmentini işle
+            for interval in intervals:
+                start_sample, end_sample = interval
 
                 # Segmenti al
                 segment = y[start_sample:end_sample]
 
                 # MFCC (Mel Frekans Kepstral Katsayıları) hesapla
-                mfccs = np.mean(librosa.feature.mfcc(y=segment, sr=sr, n_mfcc=13).T, axis=0)
+                mfccs = np.mean(librosa.feature.mfcc(y=segment, sr=sr, n_mfcc=20, n_fft=512).T, axis=0)
                 features = mfccs.reshape(1, -1)  # Özellikleri modelin kabul edeceği şekle getir
 
                 # Model ile tahmin yap
-                prediction = model.predict(features)
+                prediction = knn_model.predict(features)
                 predictions.append(prediction[0])  # Tahmin edilen sınıfı listeye ekle
-                probabilities = model.decision_function(features)  # Tahmin olasılıklarını al
 
-                # Eğer olasılık değeri belirli bir eşik değerin altındaysa
-                if np.all(probabilities < 2.21):
-                    # Ses eğitim fonksiyonuna yönlendirilir
-                    okey = Egitim.SesModelEgitim(self, file_path)
-                    return okey  # Eğitim sonucunu döndür
-                else:
-                    # Aksi durumda tahminleri döndür
-                    return predictions
+                # Use predict_proba to get probabilities
+                probabilities = knn_model.predict_proba(features)
+
+                print(prediction)
+                print(predictions)
+                print(probabilities)
+
+                if np.all(probabilities < 0.8):
+                    okey = Egitim.SesModelEgitim(self)
+                    return okey  # Eğitim sonucunu döndür"""
+
+
+
+            # Eğer tüm segmentler tahmin edilmişse tahminleri döndür
+            return predictions
+
         except Exception as e:
             # Hata durumunda hatayı yazdır
             print(e)
-            print("4")
 
     #METNE DÖNÜŞMÜŞ SESİN HAZIR KÜTÜPHANE KULLANARAK DUYGUSUNU BULMA
     def MetindenDuyguBulma(self):
@@ -258,7 +253,6 @@ class Fonksiyon(QWidget):
         except Exception as e:
             # Dosya okuma veya başka bir genel hata durumunda hatayı konsola yazdırıyoruz
             print(e)
-            print("5")
 
 
 
@@ -291,11 +285,15 @@ class Fonksiyon(QWidget):
             # Eğer bir veya daha fazla konu bulunmuşsa
             if topics:
                 for topic in topics:
-                    # İlk bulunan konuyu arayüzde göster
-                    self.Konu.setText(topic['text'])
+                    # 'text' anahtarını kontrol et
+                    if isinstance(topic, dict) and 'text' in topic and isinstance(topic['text'], str):
+                        self.Konu.setText(topic['text'])
+                        break  # İlk uygun topic bulunduğunda döngüden çık
+                    else:
+                        self.Konu.setText("Geçerli bir konu bulunamadı.")
             else:
-                # Eğer konu bulunamazsa uygun bir mesaj göster
                 self.Konu.setText("KONU ANLAŞILMADI.")
+
 
         # Dosya bulunamazsa hata mesajı ver
         except FileNotFoundError:

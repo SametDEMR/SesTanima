@@ -20,19 +20,20 @@ class Islemler(QWidget):
         ButtonName = Fonksiyon.TiklananButonAlma(self)
         FilePath = Fonksiyon.SesleriAlma(self, ButtonName)
 
+        self.setEnabled(False)
         if FilePath:
             FilePath = Fonksiyon.SesDönüstür(FilePath)
             Fonksiyon.SestenMetinYapma(self, FilePath)
             Fonksiyon.KonuBulma(self)
             Fonksiyon.MetindenDuyguBulma(self)
             deneme = Fonksiyon.SesleriAnalizEtme(self, ButtonName, FilePath)
-
-            if deneme == 1:
+            if deneme == "okey":
                 self.BilgilendirmeKutusu.setText("Model Tekrar Eğitildi. Analiz Tekrar Yapılıyor.")
+                QApplication.processEvents()
                 deneme = Fonksiyon.SesleriAnalizEtme(self, ButtonName, FilePath)
-
             GrafikCizme.GrafikCiz(self, FilePath, deneme)
 
         else:
             ShowHide.HepsiniGizle(self)
             ShowHide.Giris(self)
+        self.setEnabled(True)
