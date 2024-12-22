@@ -65,7 +65,7 @@ class Fonksiyon(QWidget):
 
         except Exception as e:
             # Herhangi bir hata durumunda kullanıcı bilgilendiriliyor
-            self.BilgilendirmeKutusu.setText(f"Hata: {str(e)}")
+            self.BilgilendirmeKutusu.setText(e)
 
 
 
@@ -132,6 +132,7 @@ class Fonksiyon(QWidget):
 
         # Diğer hataları yakalama ve ekrana yazdırma
         except Exception as e:
+            print("2")
             print(e)  # Hata mesajı konsola yazdırılıyor
 
 
@@ -168,7 +169,7 @@ class Fonksiyon(QWidget):
         except Exception as e:
             # Hata durumunda hatayı konsola yazdır
             print(e)
-
+            print("3")
 
 
 
@@ -219,6 +220,7 @@ class Fonksiyon(QWidget):
         except Exception as e:
             # Hata durumunda hatayı yazdır
             print(e)
+            print("4")
 
     #METNE DÖNÜŞMÜŞ SESİN HAZIR KÜTÜPHANE KULLANARAK DUYGUSUNU BULMA
     def MetindenDuyguBulma(self):
@@ -238,15 +240,15 @@ class Fonksiyon(QWidget):
 
                 # Çevrilen metin üzerinde duygu analizi yapıyoruz
                 analyzer = SentimentIntensityAnalyzer()
-                self.duygu = analyzer.polarity_scores(ceviri_metni)
+                duygu = analyzer.polarity_scores(ceviri_metni)
 
                 # Compound skora göre mutluluk ve mutsuzluk yüzdelerini hesaplıyoruz
-                if self.duygu['compound'] < 0:
+                if duygu['compound'] < 0:
                     mutluluk = 0
                     mutsuzluk = 100
                 else:
-                    mutluluk = self.duygu['compound'] * 100
-                    mutsuzluk = (1 - self.duygu['compound']) * 100
+                    mutluluk = duygu['compound'] * 100
+                    mutsuzluk = (1 - duygu['compound']) * 100
 
                 # Hesaplanan değerleri kullanıcıya gösteriyoruz
                 self.DuyguDurumu.setText(f"Metin: %{mutluluk:.2f} Mutlu %{mutsuzluk:.2f} Mutsuz")
@@ -256,6 +258,7 @@ class Fonksiyon(QWidget):
         except Exception as e:
             # Dosya okuma veya başka bir genel hata durumunda hatayı konsola yazdırıyoruz
             print(e)
+            print("5")
 
 
 

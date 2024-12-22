@@ -24,6 +24,7 @@ class Islemler(QWidget):
             FilePath = Fonksiyon.SesDönüstür(FilePath)
             Fonksiyon.SestenMetinYapma(self, FilePath)
             Fonksiyon.KonuBulma(self)
+            Fonksiyon.MetindenDuyguBulma(self)
             deneme = Fonksiyon.SesleriAnalizEtme(self, ButtonName, FilePath)
 
             if deneme == 1:
@@ -31,7 +32,7 @@ class Islemler(QWidget):
                 deneme = Fonksiyon.SesleriAnalizEtme(self, ButtonName, FilePath)
 
             GrafikCizme.GrafikCiz(self, FilePath, deneme)
-            Fonksiyon.MetindenDuyguBulma(self)
+
         else:
             ShowHide.HepsiniGizle(self)
             ShowHide.Giris(self)

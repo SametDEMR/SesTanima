@@ -13,8 +13,13 @@ from Fonksiyon import *
 class Egitim():
     def SesModelEgitim(self, file_path):
         try:
+            # "Sesler" ana klasörünü oluşturma
+            base_dir = "Sesler"
+            if not os.path.exists(base_dir):
+                os.makedirs(base_dir)
+
             # Yeni klasör oluşturma işlemi için temel dizin adı
-            save_dir = "kisi"
+            save_dir = os.path.join(base_dir, "kisi")
             original_dir = save_dir
             counter = 1
 
@@ -40,14 +45,13 @@ class Egitim():
                 sf.write(part_file_path, segment, sr)  # Kesiti WAV dosyası olarak kaydet
                 part_index += 1
 
-            # Geçerli çalışma dizinindeki klasörleri tarayarak veri seti oluştur
-            data_dir = os.getcwd()  # Geçerli çalışma dizini
-            data_dirs = [d for d in os.listdir(data_dir) if os.path.isdir(os.path.join(data_dir, d))]
+            # "Sesler" klasöründeki alt klasörleri tarayarak veri seti oluştur
+            data_dirs = [d for d in os.listdir(base_dir) if os.path.isdir(os.path.join(base_dir, d))]
             labels = []  # Etiketler (klasör isimleri)
             features = []  # Özellikler (MFCC değerleri)
 
             for directory in data_dirs:
-                folder_path = os.path.join(data_dir, directory)
+                folder_path = os.path.join(base_dir, directory)
                 for file in os.listdir(folder_path):
                     if file.endswith(".wav"):
                         file_path = os.path.join(folder_path, file)
@@ -79,9 +83,8 @@ class Egitim():
 
         except Exception as e:
             # Hata durumunda hatayı ekrana yazdır
+            print("1")
             print(e)
-
-
 
     # Özellik çıkarma fonksiyonu (MFCC değerlerini hesaplar)
     def OzellikCikarma(self, file_path):
