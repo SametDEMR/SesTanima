@@ -2,10 +2,10 @@ import sys
 from PyQt5.QtWidgets import QApplication, QWidget
 from PyQt5.QtCore import Qt
 
-from ShowHide import *
 from Button import *
 from TextArea import *
 from Grafik import *
+from MetinYerleri import *
 
 class SesTanima(QWidget):
     def __init__(self):
@@ -18,6 +18,8 @@ class SesTanima(QWidget):
         MetinYerleri.MetinYeri(self)
         Grafik.GrafikOlustur(self)
         ButonOlustur.Butonlar(self)
+        MetinGirisiOlustur.MetinAlanlari(self)
+
         ShowHide.HepsiniGizle(self)
         ShowHide.Giris(self)
 

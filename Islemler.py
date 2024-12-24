@@ -1,5 +1,6 @@
 from PyQt5.QtWidgets import QWidget
 import threading
+
 from Fonksiyon import *
 from GrafikCizme import *
 from ShowHide import *

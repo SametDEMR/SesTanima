@@ -171,47 +171,18 @@ class Fonksiyon(QWidget):
     # Sesin kime ait olduğunu bulma fonksiyonu
     def SesinKimeAitOlduğunuBulma(self, file_path):
         try:
-            model_file_name = "KNN_model.pkl"
-            knn_model = joblib.load(model_file_name)
+            # Modeli yükle
+            model, label_encoder = joblib.load("model.pkl")
 
-            y, sr = librosa.load(file_path, duration=15)
-            mfccs = np.mean(librosa.feature.mfcc(y=y, sr=sr, n_mfcc=13).T, axis=0)
+            # Özellik çıkar ve tahmin yap
+            y, sr = librosa.load(file_path, duration=2.5, offset=0.6)
+            mfcc = librosa.feature.mfcc(y=y, sr=sr, n_mfcc=40)
+            feature = np.mean(mfcc.T, axis=0)  # 2D'yi 1D'ye indirgeme
 
-            intervals = librosa.effects.split(y, top_db=30)  # Sessizlik eşik değeri (30 dB)
-
-            # Sonuçları saklamak için bir liste oluşturuluyor
-            predictions = []
-
-            # Her bir konuşma segmentini işle
-            for interval in intervals:
-                start_sample, end_sample = interval
-
-                # Segmenti al
-                segment = y[start_sample:end_sample]
-
-                # MFCC (Mel Frekans Kepstral Katsayıları) hesapla
-                mfccs = np.mean(librosa.feature.mfcc(y=segment, sr=sr, n_mfcc=20, n_fft=512).T, axis=0)
-                features = mfccs.reshape(1, -1)  # Özellikleri modelin kabul edeceği şekle getir
-
-                # Model ile tahmin yap
-                prediction = knn_model.predict(features)
-                predictions.append(prediction[0])  # Tahmin edilen sınıfı listeye ekle
-
-                # Use predict_proba to get probabilities
-                probabilities = knn_model.predict_proba(features)
-
-                print(prediction)
-                print(predictions)
-                print(probabilities)
-
-                if np.all(probabilities < 0.8):
-                    okey = Egitim.SesModelEgitim(self)
-                    return okey  # Eğitim sonucunu döndür"""
-
-
-
-            # Eğer tüm segmentler tahmin edilmişse tahminleri döndür
-            return predictions
+            # Tahmin yap
+            prediction = model.predict([feature])  # Artık feature 1D ve 2D bekleyen modele uygun
+            predicted_label = label_encoder.inverse_transform(prediction)
+            return predicted_label
 
         except Exception as e:
             # Hata durumunda hatayı yazdır

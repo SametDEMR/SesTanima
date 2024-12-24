@@ -15,7 +15,10 @@ class ButonOlustur(QWidget):
         buttons_info = [
             {"bilgi": "GeriButton", "text": "Geri", "position": (10, 10, 100, 40),"function": lambda: ShowHide.Geri(self)},
             {"bilgi": "MikrofonSesButton", "text": "MİKROFONDAN SES TANIMA", "position": (120, 310, 420, 40), "function": lambda: Islemler.Thread(self)},
-            {"bilgi": "DosyadanSesButton", "text": "SES DOSYASINDAN SES TANIMA", "position": (660, 310, 420, 40), "function": lambda: Islemler.Thread(self)}
+            {"bilgi": "DosyadanSesButton", "text": "SES DOSYASINDAN SES TANIMA", "position": (660, 310, 420, 40), "function": lambda: Islemler.Thread(self)},
+            {"bilgi": "SesEkleme", "text": "Ses EKleme", "position": (390, 370, 420, 40), "function": lambda: ShowHide.ModeleSesEkleme(self)},
+            {"bilgi": "SesSecme", "text": "Sesi Dosyadan Al", "position": (120, 400, 420, 40), "function": lambda: Egitim.DosyadanSec(self)},
+            {"bilgi": "KaydiBaslat", "text": "Kaydı Başlatma", "position": (660, 400, 420, 40), "function": lambda: Egitim.KaydiBaslat(self)},
         ]
 
         for button_info in buttons_info:

@@ -45,3 +45,5 @@ class Grafik(QWidget):
         self.ax1.set_facecolor('#C0E0E0')
         self.ax2.set_facecolor('#C0E0E0')
         self.ax3.set_facecolor('#C0E0E0')
+
+        self.ax3.axis('off')

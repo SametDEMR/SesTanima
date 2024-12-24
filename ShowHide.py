@@ -11,10 +11,19 @@ class ShowHide(QWidget):
         self.GeriButton.hide()
         self.MikrofonSesButton.hide()
         self.DosyadanSesButton.hide()
+
+        self.SesEkleme.hide()
+        self.SesSecme.hide()
+
         self.BilgilendirmeKutusu.hide()
         self.DuyguDurumu.hide()
         self.KacKelimeVar.hide()
         self.Konu.hide()
+
+        self.Ad.hide()
+        self.Adres.hide()
+        self.KaydiBaslat.hide()
+
         self.canvas1.hide()
         self.canvas2.hide()
         self.canvas3.hide()
@@ -23,6 +32,8 @@ class ShowHide(QWidget):
     def Giris(self):
         self.MikrofonSesButton.show()
         self.DosyadanSesButton.show()
+
+        self.SesEkleme.show()
 
     # Çıktı ekranındaki bileşenleri gösteren fonksiyon
     def CiktiKismi(self):
@@ -41,3 +52,12 @@ class ShowHide(QWidget):
         GrafikCizme.GrafikTemizleme(self)
         ShowHide.HepsiniGizle(self)
         ShowHide.Giris(self)
+
+    def ModeleSesEkleme(self):
+        ShowHide.HepsiniGizle(self)
+
+        self.GeriButton.show()
+        self.Ad.show()
+        self.Adres.show()
+        self.KaydiBaslat.show()
+        self.SesSecme.show()
