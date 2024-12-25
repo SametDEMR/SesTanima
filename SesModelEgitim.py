@@ -38,10 +38,15 @@ class Egitim:
     def KaydiBaslat(self):
         try:
             icerik = self.Ad.text()
+
+            dosya_yolu = os.path.abspath(icerik)
+            duzeltilmis_yol = dosya_yolu.replace("\\", "/")
+            self.Adres.setText(duzeltilmis_yol)
             print(icerik)
+
             if (len(icerik) > 0):
                 samplerate = 44100  # Ses örnekleme oranı
-                duration = 5  # Kaydetme süresi (saniye)
+                duration = 15 # Kaydetme süresi (saniye)
                 directory = icerik  # Klasör adı
                 file_name = 'kayit.wav'  # Dosya adı
 
@@ -59,8 +64,10 @@ class Egitim:
                 # Kaydedilen ses dosyası belirtilen formata dönüştürülüp kaydediliyor
                 write(file_path, samplerate, (recorded_audio * 32767).astype(np.int16))
                 print(f"Ses kaydı başarıyla kaydedildi: {file_path}")
+                
+                Egitim.SesiParçala(self)
             else:
-                print("değer gir amk")
+                print("değer gir")
         except Exception as e:
             print(e)
 
@@ -80,7 +87,7 @@ class Egitim:
                 chunk_length_ms = 5 * 1000
 
                 input_file = self.Adres.text()
-                output_folder = f"ModelSes/{self.Ad.text()}"
+                output_folder = f"/ModelSes/{self.Ad.text()}"
                 # Ses dosyasını yükle
                 audio = AudioSegment.from_file(input_file)
 

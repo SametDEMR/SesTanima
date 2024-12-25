@@ -10,9 +10,10 @@ class MetinYerleri(QWidget):
         # UYARI-BİLGİLENDİRME MESAJ YERLERİ OLUŞTURULDU
         labels_info = [
             {"bilgi": "BilgilendirmeKutusu", "text": "Lütfen bir seçim yapınız.", "position": (0, 0, 1200, 40)},
-            {"bilgi": "DuyguDurumu", "text": "", "position": (0, 580, 1200, 40)},
-            {"bilgi": "KacKelimeVar", "text": "", "position": (0, 640, 1200, 40)},
-            {"bilgi": "Konu", "text": "", "position": (0, 700, 1200, 40)},
+            {"bilgi": "KonusulanKisiSirasi", "text": "", "position": (0, 580, 1200, 40)},
+            {"bilgi": "DuyguDurumu", "text": "", "position": (20, 640, 1200, 40)},
+            {"bilgi": "KacKelimeVar", "text": "", "position": (20, 700, 1200, 40)},
+            {"bilgi": "Konu", "text": "", "position": (620, 700, 1200, 40)},
         ]
 
         for label_info in labels_info:
@@ -31,7 +32,8 @@ class MetinYerleri(QWidget):
                 }
             """)
 
-            label.setAlignment(Qt.AlignCenter)
+            if bilgi == "BilgilendirmeKutusu" or bilgi == "KonusulanKisiSirasi":
+                label.setAlignment(Qt.AlignCenter)
 
             self.labels.append(label)
             setattr(self, bilgi, label)

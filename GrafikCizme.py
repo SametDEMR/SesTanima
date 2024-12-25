@@ -8,6 +8,7 @@ from TextArea import *
 class GrafikCizme():
     def GrafikCiz(self, file_path, predictions):
         try:
+            self.ax3.axis('off')
             # Ses dosyasını yükle
             y, sr = librosa.load(file_path)
 
@@ -38,13 +39,18 @@ class GrafikCizme():
             ax.pie(sayılar, labels=adlar, autopct='%1.1f%%', startangle=90)
             ax.axis('equal')
             self.canvas3.draw()
+
+            for yazi in predictions:
+                self.KonusulanKisiSirasi.setText(self.KonusulanKisiSirasi.text() + yazi + "  ")
         except Exception as e:
             # Hata mesajını göster
             print(e)
 
     def GrafikTemizleme(self):
         try:
+            self.ax3.axis('off')
             # Bilgi alanlarını temizle
+            self.KonusulanKisiSirasi.setText("")
             self.BilgilendirmeKutusu.setText("")
             self.DuyguDurumu.setText("")
             self.KacKelimeVar.setText("")

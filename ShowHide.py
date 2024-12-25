@@ -37,6 +37,7 @@ class ShowHide(QWidget):
 
     # Çıktı ekranındaki bileşenleri gösteren fonksiyon
     def CiktiKismi(self):
+        self.ax3.axis('off')
         self.GeriButton.show()
         self.BilgilendirmeKutusu.show()
         self.DuyguDurumu.show()

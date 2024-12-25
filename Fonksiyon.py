@@ -12,6 +12,10 @@ import os
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
 import nltk
 
+import matplotlib.pyplot as plt
+import matplotlib.cm as cm
+import numpy as np
+
 
 from SesModelEgitim import *
 
@@ -174,19 +178,39 @@ class Fonksiyon(QWidget):
             # Modeli yükle
             model, label_encoder = joblib.load("model.pkl")
 
-            # Özellik çıkar ve tahmin yap
-            y, sr = librosa.load(file_path, duration=2.5, offset=0.6)
-            mfcc = librosa.feature.mfcc(y=y, sr=sr, n_mfcc=40)
-            feature = np.mean(mfcc.T, axis=0)  # 2D'yi 1D'ye indirgeme
+            # Ses dosyasını yükle
+            y, sr = librosa.load(file_path)
 
-            # Tahmin yap
-            prediction = model.predict([feature])  # Artık feature 1D ve 2D bekleyen modele uygun
-            predicted_label = label_encoder.inverse_transform(prediction)
-            return predicted_label
+            # Segment uzunluğu (1 saniye)
+            segment_duration = sr  # 1 saniye için örnek sayısı
+            total_duration = len(y)
+
+            results = []
+
+            # Ses dosyasını segmentlere ayır ve analiz et
+            for start in range(0, total_duration, segment_duration):
+                end = start + segment_duration
+                if end > total_duration:
+                    break
+
+                segment = y[start:end]
+
+                # MFCC özelliklerini çıkar
+                mfcc = librosa.feature.mfcc(y=segment, sr=sr, n_mfcc=40)
+                feature = np.mean(mfcc.T, axis=0)  # 2D'yi 1D'ye indirgeme
+
+                # Tahmin yap
+                prediction = model.predict([feature])
+                predicted_label = label_encoder.inverse_transform(prediction)
+
+                # Sonucu listeye ekle
+                results.append(predicted_label[0])
+            return results
 
         except Exception as e:
             # Hata durumunda hatayı yazdır
             print(e)
+            return []
 
     #METNE DÖNÜŞMÜŞ SESİN HAZIR KÜTÜPHANE KULLANARAK DUYGUSUNU BULMA
     def MetindenDuyguBulma(self):
@@ -231,41 +255,28 @@ class Fonksiyon(QWidget):
     def KonuBulma(self):
         # Dosya yolunu tanımla
         file_path = "output.txt"
+        with open(file_path, 'r', encoding='utf-8') as file:
+            text = file.read()
 
-        # SpaCy dil modeli yükleniyor (İngilizce için)
-        nlp = spacy.load("en_core_web_sm")
+        basliklar = {
+            "TEKNOLOJİ": ["bilgisayar", "yazılım", "teknoloji", "internet", "yapay zeka", "robot", "kodlama"],
+            "SPOR": ["futbol", "basketbol", "koşu", "antrenman", "maç", "şampiyon", "spor"],
+            "SANAT": ["resim", "müzik", "heykel", "şiir", "tiyatro", "sanat", "sinema"],
+            "GİYİM": ["elbise", "moda", "ayakkabı", "pantolon", "kazak", "çanta", "giyim"]
+        }
 
-        try:
-            # Dosyadan metni oku
-            with open(file_path, 'r', encoding='utf-8') as file:
-                text = file.read()
+        # Metni küçük harflere çevir
+        metin = text.lower()
 
-            # Metni SpaCy ile analiz et
-            doc = nlp(text)
+        # Skor tablosu
+        skorlar = {"TEKNOLOJİ": 0, "SPOR": 0, "SANAT": 0, "GİYİM": 0}
 
-            # Konuları depolamak için bir liste oluştur
-            topics = []
+        # Anahtar kelimelere göre skoru artır
+        for baslik, anahtar_kelimeler in basliklar.items():
+            for kelime in anahtar_kelimeler:
+                if kelime in metin:
+                    skorlar[baslik] += 1
 
-            # Metindeki varlıkları (entities) bul ve listeye ekle
-            for ent in doc.ents:
-                topics.append({
-                    "text": ent.text,  # Bulunan varlık metni
-                    "label": ent.label_  # Varlık etiketi (ör. kişi, yer, organizasyon)
-                })
-
-            # Eğer bir veya daha fazla konu bulunmuşsa
-            if topics:
-                for topic in topics:
-                    # 'text' anahtarını kontrol et
-                    if isinstance(topic, dict) and 'text' in topic and isinstance(topic['text'], str):
-                        self.Konu.setText(topic['text'])
-                        break  # İlk uygun topic bulunduğunda döngüden çık
-                    else:
-                        self.Konu.setText("Geçerli bir konu bulunamadı.")
-            else:
-                self.Konu.setText("KONU ANLAŞILMADI.")
-
-
-        # Dosya bulunamazsa hata mesajı ver
-        except FileNotFoundError:
-            print(f"The file '{file_path}' was not found. Please check the path and try again.")
+        # En yüksek skoru alan başlığı döndür
+        en_uygun_baslik = max(skorlar, key=skorlar.get)
+        self.Konu.setText(f"Konuşulan Konu:  {en_uygun_baslik}")
