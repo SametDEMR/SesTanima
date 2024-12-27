@@ -11,10 +11,8 @@ import spacy
 import os
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
 import nltk
-
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
-import numpy as np
 
 
 from SesModelEgitim import *
@@ -73,7 +71,7 @@ class Fonksiyon(QWidget):
 
 
     #SESİ UYGUN FORMATA DÖNÜŞTÜR VE KAYDET.
-    def SesDönüstür(file_path):
+    def SesDönüstür(self, file_path):
         try:
             # Dosyanın uzantısını al ve küçük harfe çevir
             file_extension = os.path.splitext(file_path)[1].lower()
@@ -102,7 +100,7 @@ class Fonksiyon(QWidget):
             return file_path
         except Exception as e:
             # Hata durumunda hata mesajını yazdır ve None döndür
-            print("Hata oluştu:", e)
+            self.BilgilendirmeKutusu.setText(e)
             return None
 
 
@@ -133,7 +131,7 @@ class Fonksiyon(QWidget):
 
         # Diğer hataları yakalama ve ekrana yazdırma
         except Exception as e:
-            print(e)  # Hata mesajı konsola yazdırılıyor
+            self.BilgilendirmeKutusu.setText(e)  # Hata mesajı konsola yazdırılıyor
 
 
 
@@ -168,7 +166,7 @@ class Fonksiyon(QWidget):
                 return Predictions
         except Exception as e:
             # Hata durumunda hatayı konsola yazdır
-            print(e)
+            self.BilgilendirmeKutusu.setText(e)
 
 
 
@@ -209,7 +207,7 @@ class Fonksiyon(QWidget):
 
         except Exception as e:
             # Hata durumunda hatayı yazdır
-            print(e)
+            self.BilgilendirmeKutusu.setText(e)
             return []
 
     #METNE DÖNÜŞMÜŞ SESİN HAZIR KÜTÜPHANE KULLANARAK DUYGUSUNU BULMA
@@ -247,36 +245,39 @@ class Fonksiyon(QWidget):
                 self.DuyguDurumu.setText(f"Bir hata oluştu: {e}")
         except Exception as e:
             # Dosya okuma veya başka bir genel hata durumunda hatayı konsola yazdırıyoruz
-            print(e)
+            self.BilgilendirmeKutusu.setText(e)
 
 
 
     # METNE DÖNÜŞMÜŞ SESİN KONUSUNU BULMA
     def KonuBulma(self):
-        # Dosya yolunu tanımla
-        file_path = "output.txt"
-        with open(file_path, 'r', encoding='utf-8') as file:
-            text = file.read()
+        try:
+            # Dosya yolunu tanımla
+            file_path = "output.txt"
+            with open(file_path, 'r', encoding='utf-8') as file:
+                text = file.read()
 
-        basliklar = {
-            "TEKNOLOJİ": ["bilgisayar", "yazılım", "teknoloji", "internet", "yapay zeka", "robot", "kodlama"],
-            "SPOR": ["futbol", "basketbol", "koşu", "antrenman", "maç", "şampiyon", "spor"],
-            "SANAT": ["resim", "müzik", "heykel", "şiir", "tiyatro", "sanat", "sinema"],
-            "GİYİM": ["elbise", "moda", "ayakkabı", "pantolon", "kazak", "çanta", "giyim"]
-        }
+            basliklar = {
+                "TEKNOLOJİ": ["bilgisayar", "yazılım", "teknoloji", "internet", "yapay zeka", "robot", "kodlama"],
+                "SPOR": ["futbol", "basketbol", "koşu", "antrenman", "maç", "şampiyon", "spor"],
+                "SANAT": ["resim", "müzik", "heykel", "şiir", "tiyatro", "sanat", "sinema"],
+                "GİYİM": ["elbise", "moda", "ayakkabı", "pantolon", "kazak", "çanta", "giyim"]
+            }
 
-        # Metni küçük harflere çevir
-        metin = text.lower()
+            # Metni küçük harflere çevir
+            metin = text.lower()
 
-        # Skor tablosu
-        skorlar = {"TEKNOLOJİ": 0, "SPOR": 0, "SANAT": 0, "GİYİM": 0}
+            # Skor tablosu
+            skorlar = {"TEKNOLOJİ": 0, "SPOR": 0, "SANAT": 0, "GİYİM": 0}
 
-        # Anahtar kelimelere göre skoru artır
-        for baslik, anahtar_kelimeler in basliklar.items():
-            for kelime in anahtar_kelimeler:
-                if kelime in metin:
-                    skorlar[baslik] += 1
+            # Anahtar kelimelere göre skoru artır
+            for baslik, anahtar_kelimeler in basliklar.items():
+                for kelime in anahtar_kelimeler:
+                    if kelime in metin:
+                        skorlar[baslik] += 1
 
-        # En yüksek skoru alan başlığı döndür
-        en_uygun_baslik = max(skorlar, key=skorlar.get)
-        self.Konu.setText(f"Konuşulan Konu:  {en_uygun_baslik}")
+            # En yüksek skoru alan başlığı döndür
+            en_uygun_baslik = max(skorlar, key=skorlar.get)
+            self.Konu.setText(f"Konuşulan Konu:  {en_uygun_baslik}")
+        except Exception as e:
+            self.BilgilendirmeKutusu.setText(e)

@@ -44,7 +44,7 @@ class GrafikCizme():
                 self.KonusulanKisiSirasi.setText(self.KonusulanKisiSirasi.text() + yazi + "  ")
         except Exception as e:
             # Hata mesajını göster
-            print(e)
+            self.BilgilendirmeKutusu.setText(e)
 
     def GrafikTemizleme(self):
         try:
@@ -77,4 +77,4 @@ class GrafikCizme():
             self.canvas3.draw()
         except Exception as e:
             # Hata mesajını göster
-            print(e)
+            self.BilgilendirmeKutusu.setText(e)

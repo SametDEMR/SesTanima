@@ -62,3 +62,4 @@ class ShowHide(QWidget):
         self.Adres.show()
         self.KaydiBaslat.show()
         self.SesSecme.show()
+        self.BilgilendirmeKutusu.show()
