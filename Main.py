@@ -11,7 +11,7 @@ class SesTanima(QWidget):
     def __init__(self):
         super().__init__()
 
-        self.setWindowTitle("SES TANIMA, SESTEN DUYGU ANALİZİ, KONUŞULAN KONU TAHMİNLEME UYGULAMASI")
+        self.setWindowTitle("SES TANIMA UYGULAMASI")
         self.setStyleSheet("background-color: #C0E0E0")
         self.setFixedSize(1200, 760)
 
